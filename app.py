@@ -9,7 +9,7 @@ from collections import deque
 
 app = Flask(__name__)
 
-PROWLARR_URL = "http://192.168.178.94:9696"
+PROWLARR_URL = os.getenv("PROWLARR_URL", "http://192.168.178.94:9696")
 RULES_FILE = "rules.json"
 LOG_BUFFER_MAX_LINES = 500
 LOG_BUFFER = deque(maxlen=LOG_BUFFER_MAX_LINES)

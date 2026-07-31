@@ -1,0 +1,14 @@
+services:
+  rewrite-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rewrite-proxy:latest
+    container_name: rewrite-proxy
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      PROWLARR_URL: http://your-prowlarr-host:9696
+    volumes:
+      - ./rules.json:/app/rules.json:ro

@@ -115,7 +115,36 @@ def get_rules_state():
     """Gibt die aktuell gespeicherten Regeln zurück und aktualisiert den globalen Zustand."""
     global RULES
     RULES = load_rules()
+    apply_settings_from_rules(RULES, force=False)
     return RULES
+
+
+def apply_settings_from_rules(rules, force: bool = False):
+    """Übernimmt Einstellungen aus der rules.json in laufende Konfiguration.
+
+    - Wenn `force` True ist, überschreibt die Datei auch Umgebungsvariablen.
+    - Wenn `force` False, nehmen wir Umgebungsvariablen (z.B. PROWLARR_URL) als
+      Priorität beim Start.
+    """
+    global PROWLARR_URL
+
+    if not rules:
+        return
+
+    settings = rules.get("settings", {})
+    file_prowlarr = settings.get("prowlarr_url")
+
+    if not file_prowlarr:
+        return
+
+    env_val = os.getenv("PROWLARR_URL")
+    if env_val and not force:
+        log_event(f"INFO: PROWLARR_URL in env present ({env_val}); keeping env precedence")
+        return
+
+    if file_prowlarr != PROWLARR_URL:
+        PROWLARR_URL = file_prowlarr
+        log_event(f"INFO: PROWLARR_URL set from rules.json -> {PROWLARR_URL}")
 
 
 def get_default_rules():
@@ -456,9 +485,10 @@ def update_rules():
         # Speichere in rules.json
         save_rules_to_disk(new_rules)
         
-        # Laden Sie die neuen Regeln in den Speicher
+        # Laden Sie die neuen Regeln in den Speicher und wende Einstellungen an
         global RULES
         RULES = load_rules()
+        apply_settings_from_rules(RULES, force=True)
         
         log_event(f"DEBUG: Regeln aktualisiert: {RULES_FILE}")
         
@@ -481,7 +511,8 @@ def reload_rules():
     try:
         global RULES
         RULES = load_rules()
-        
+        apply_settings_from_rules(RULES, force=True)
+
         log_event(f"DEBUG: Regeln neu geladen aus {RULES_FILE}")
         
         return jsonify({

@@ -41,6 +41,33 @@ class TestAppConfig(unittest.TestCase):
 
             sys.modules.pop("app", None)
 
+    def test_rewrite_query_uses_latest_rules_from_disk(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            config_path = os.path.join(tmpdir, "rules.json")
+            with open(config_path, "w", encoding="utf-8") as f:
+                json.dump({
+                    "settings": {"rewrite_enabled": False},
+                    "search_rules": []
+                }, f)
+
+            sys.modules.pop("app", None)
+            module = importlib.import_module("app")
+            module.RULES_FILE = config_path
+            module.RULES = {
+                "settings": {"rewrite_enabled": True},
+                "search_rules": [{
+                    "name": "Test",
+                    "pattern": "(foo)",
+                    "enabled": True,
+                    "case_insensitive": False,
+                    "action": "extract"
+                }]
+            }
+
+            self.assertEqual(module.rewrite_query("barfoo"), "barfoo")
+
+            sys.modules.pop("app", None)
+
 
 if __name__ == "__main__":
     unittest.main()

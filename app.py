@@ -10,7 +10,7 @@ from collections import deque
 
 app = Flask(__name__)
 
-PROWLARR_URL = os.getenv("PROWLARR_URL", "http://192.168.178.94:9696")
+PROWLARR_URL = os.getenv("PROWLARR_URL", "http://your-prowlarr-host:9696")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 RULES_FILE = os.getenv("RULES_FILE", "/config/rules.json")
 DEFAULT_RULES_SOURCE = os.getenv("DEFAULT_RULES_SOURCE", os.path.join(BASE_DIR, "rules.json"))
@@ -101,6 +101,23 @@ def load_rules():
         return get_default_rules()
 
 
+def save_rules_to_disk(rules_data):
+    """Schreibt Regeln atomar auf die Konfigurationsdatei."""
+    ensure_rules_file()
+    temp_path = f"{RULES_FILE}.tmp"
+    with open(temp_path, 'w', encoding='utf-8') as f:
+        json.dump(rules_data, f, indent=2)
+    os.replace(temp_path, RULES_FILE)
+    return rules_data
+
+
+def get_rules_state():
+    """Gibt die aktuell gespeicherten Regeln zurück und aktualisiert den globalen Zustand."""
+    global RULES
+    RULES = load_rules()
+    return RULES
+
+
 def get_default_rules():
     """Gibt Standard-Regeln zurück, falls rules.json nicht existiert."""
     return {
@@ -179,18 +196,20 @@ def apply_skip_rule(text, pattern, flags):
 
 
 def rewrite_query(q):
-    """Rewritten Suchanfrage basierend auf rules.json"""
+    """Rewritten Suchanfrage basierend auf den aktuell gespeicherten Regeln."""
+    rules = get_rules_state()
+
     # Debug: Eingabe loggen
     log_event(f"[rewrite_query] Input: {q}")
-    log_event(f"[rewrite_query] RULES is None: {RULES is None}")
-    log_event(f"[rewrite_query] Rewrite enabled: {RULES.get('settings', {}).get('rewrite_enabled', True) if RULES else 'N/A'}")
+    log_event(f"[rewrite_query] RULES is None: {rules is None}")
+    log_event(f"[rewrite_query] Rewrite enabled: {rules.get('settings', {}).get('rewrite_enabled', True) if rules else 'N/A'}")
     
-    if not q or not RULES.get("settings", {}).get("rewrite_enabled", True):
+    if not q or not rules.get("settings", {}).get("rewrite_enabled", True):
         log_event("[rewrite_query] Early return - returning unchanged")
         return q
 
     original = q
-    search_rules = RULES.get("search_rules", [])
+    search_rules = rules.get("search_rules", [])
     matched_rule_name = None
     log_event(f"[rewrite_query] Found {len(search_rules)} search rules")
 
@@ -405,7 +424,7 @@ def admin_panel():
 @app.route("/api/rules", methods=["GET"])
 def get_rules():
     """GET /api/rules - Gibt alle Regeln zurück"""
-    return jsonify(RULES), 200
+    return jsonify(get_rules_state()), 200
 
 
 @app.route("/api/logs")
@@ -435,12 +454,11 @@ def update_rules():
             }), 400
         
         # Speichere in rules.json
-        with open(RULES_FILE, 'w') as f:
-            json.dump(new_rules, f, indent=2)
+        save_rules_to_disk(new_rules)
         
         # Laden Sie die neuen Regeln in den Speicher
         global RULES
-        RULES = new_rules
+        RULES = load_rules()
         
         log_event(f"DEBUG: Regeln aktualisiert: {RULES_FILE}")
         
@@ -482,7 +500,8 @@ def reload_rules():
 @app.route('/favicon.ico')
 def favicon():
     """Proxy favicon from configured Prowlarr URL."""
-    prowlarr_url = RULES.get('settings', {}).get('prowlarr_url', PROWLARR_URL)
+    rules = get_rules_state()
+    prowlarr_url = rules.get('settings', {}).get('prowlarr_url', PROWLARR_URL)
     prowlarr_url = prowlarr_url.rstrip('/')
     favicon_paths = ['/favicon.ico', '/favicon-32x32.png', '/favicon.png', '/favicon.svg']
 

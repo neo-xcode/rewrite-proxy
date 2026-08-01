@@ -1,0 +1,23 @@
+{
+  "search_rules": [
+    {
+      "name": "UmlautAdaptarr",
+      "description": "Ersetzt deutsche Umlaute (ä → ae, ö → oe, ü → ue, ß → ss) und entfernt führende Artikel.",
+      "pattern": ".*",
+      "enabled": false,
+      "case_insensitive": true,
+      "action": "umlaut_adaptarr"
+    }
+  ],
+  "release_rules": [
+    {
+      "name": "Default Release Title Rewrite",
+      "description": "Fügt originale Suchanfrage in Release-Titel ein",
+      "enabled": true
+    }
+  ],
+  "settings": {
+    "prowlarr_url": "http://192.168.178.94:9696",
+    "rewrite_enabled": true
+  }
+}

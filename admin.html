@@ -839,6 +839,7 @@ replacement wird nur für action="replace" genutzt.</pre>
             section.classList.add('hidden-section');
             if (btn) btn.classList.add('collapsed');
         }
+        saveUIState();
     }
 
     function loadLogs(force = false) {
@@ -875,6 +876,7 @@ replacement wird nur für action="replace" genutzt.</pre>
             section.classList.add('hidden-section');
             if (btn) btn.classList.add('collapsed');
         }
+        saveUIState();
     }
 
     function exportRules() {
@@ -957,6 +959,7 @@ replacement wird nur für action="replace" genutzt.</pre>
             section.classList.add('hidden-section');
             btn.classList.add('collapsed');
         }
+        saveUIState();
     }
 
     function toggleHelpSection() {
@@ -973,10 +976,65 @@ replacement wird nur für action="replace" genutzt.</pre>
             section.classList.add('hidden-section');
             btn.classList.add('collapsed');
         }
+        saveUIState();
+    }
+
+    // Persist UI section visibility in localStorage so F5 keeps positions
+    const UI_STATE_KEY = 'rewrite_proxy_ui_state_v1';
+
+    function saveUIState() {
+        try {
+            const state = {
+                rulesVisible: !!rulesVisible,
+                helpVisible: !!helpVisible,
+                logsVisible: !!logsVisible,
+                jsonVisible: !!jsonVisible
+            };
+            localStorage.setItem(UI_STATE_KEY, JSON.stringify(state));
+        } catch (e) {
+            // ignore storage errors
+            console.warn('Could not save UI state', e);
+        }
+    }
+
+    function loadUIState() {
+        try {
+            const raw = localStorage.getItem(UI_STATE_KEY);
+            if (!raw) return;
+            const state = JSON.parse(raw);
+            rulesVisible = !!state.rulesVisible;
+            helpVisible = !!state.helpVisible;
+            logsVisible = !!state.logsVisible;
+            jsonVisible = !!state.jsonVisible;
+
+            applyVisibility('rulesSection', 'toggleRulesBtn', rulesVisible);
+            applyVisibility('helpSection', 'toggleHelpBtn', helpVisible);
+            applyVisibility('logsSection', 'toggleLogsBtn', logsVisible);
+            applyVisibility('jsonSection', 'toggleJsonBtn', jsonVisible);
+        } catch (e) {
+            console.warn('Could not load UI state', e);
+        }
+    }
+
+    function applyVisibility(sectionId, btnId, visible) {
+        const section = document.getElementById(sectionId);
+        const btn = document.getElementById(btnId);
+        if (!section || !btn) return;
+        if (visible) {
+            section.classList.remove('hidden-section');
+            section.classList.add('visible-section');
+            btn.classList.remove('collapsed');
+        } else {
+            section.classList.remove('visible-section');
+            section.classList.add('hidden-section');
+            btn.classList.add('collapsed');
+        }
     }
 
     // Initiales Laden
     console.log('Initializing Rewrite Proxy Admin Panel...');
+    // Restore section visibility from previous session
+    loadUIState();
     checkHealth();
     loadRulesUI();
 

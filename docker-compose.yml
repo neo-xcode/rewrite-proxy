@@ -11,4 +11,4 @@ services:
     environment:
       PROWLARR_URL: http://your-prowlarr-host:9696
     volumes:
-      - ./rules.json:/app/rules.json:ro
+      - ./config:/config

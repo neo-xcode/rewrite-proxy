@@ -3,6 +3,7 @@ import requests
 import re
 import json
 import os
+import shutil
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from collections import deque
@@ -10,7 +11,9 @@ from collections import deque
 app = Flask(__name__)
 
 PROWLARR_URL = os.getenv("PROWLARR_URL", "http://192.168.178.94:9696")
-RULES_FILE = "rules.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+RULES_FILE = os.getenv("RULES_FILE", "/config/rules.json")
+DEFAULT_RULES_SOURCE = os.getenv("DEFAULT_RULES_SOURCE", os.path.join(BASE_DIR, "rules.json"))
 LOG_BUFFER_MAX_LINES = 500
 LOG_BUFFER = deque(maxlen=LOG_BUFFER_MAX_LINES)
 BERLIN_TZ = ZoneInfo("Europe/Berlin")
@@ -49,14 +52,49 @@ def check_prowlarr_health():
         return False, f"Error: {str(e)}"
 
 
+def ensure_rules_file():
+    """Stellt sicher, dass die Konfigurationsdatei im Mount-Pfad vorhanden ist."""
+    global RULES_FILE
+
+    config_dir = os.path.dirname(RULES_FILE)
+    if config_dir:
+        try:
+            os.makedirs(config_dir, exist_ok=True)
+        except PermissionError as e:
+            fallback_path = os.path.join(BASE_DIR, "config", "rules.json")
+            fallback_dir = os.path.dirname(fallback_path)
+            os.makedirs(fallback_dir, exist_ok=True)
+            RULES_FILE = fallback_path
+            config_dir = fallback_dir
+            log_event(f"WARNING: Konnte {RULES_FILE} nicht anlegen: {e}. Verwende Fallback {fallback_path}")
+
+    if os.path.exists(RULES_FILE):
+        return
+
+    if os.path.exists(DEFAULT_RULES_SOURCE):
+        try:
+            shutil.copyfile(DEFAULT_RULES_SOURCE, RULES_FILE)
+            log_event(f"Initialized {RULES_FILE} from {DEFAULT_RULES_SOURCE}")
+            return
+        except Exception as e:
+            log_event(f"ERROR: Konnte {DEFAULT_RULES_SOURCE} nach {RULES_FILE} kopieren: {str(e)}")
+
+    with open(RULES_FILE, 'w', encoding='utf-8') as f:
+        json.dump(get_default_rules(), f, indent=2)
+
+    log_event(f"WARNING: {RULES_FILE} nicht gefunden. Erstelle Standard-Regeln.")
+
+
 def load_rules():
     """Lädt die rules.json Datei. Falls nicht vorhanden, wird eine Default-Konfiguration verwendet."""
+    ensure_rules_file()
+
     if os.path.exists(RULES_FILE):
         try:
-            with open(RULES_FILE, 'r') as f:
+            with open(RULES_FILE, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except Exception as e:
-            log_event(f"ERROR: Konnte rules.json nicht laden: {str(e)}")
+            log_event(f"ERROR: Konnte {RULES_FILE} nicht laden: {str(e)}")
             return get_default_rules()
     else:
         log_event(f"WARNING: {RULES_FILE} nicht gefunden. Verwende Standard-Regeln.")

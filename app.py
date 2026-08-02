@@ -11,7 +11,7 @@ from collections import deque
 
 app = Flask(__name__)
 
-PROWLARR_URL = os.getenv("PROWLARR_URL", "http://your-prowlarr-host:9696")
+PROWLARR_URL = os.getenv("PROWLARR_URL", "http://your_prowlarr_host:9696")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 RULES_FILE = os.getenv("RULES_FILE", "/config/rules.json")
 DEFAULT_RULES_SOURCE = os.getenv("DEFAULT_RULES_SOURCE", os.path.join(BASE_DIR, "rules.json"))

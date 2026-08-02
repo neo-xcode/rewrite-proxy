@@ -17,7 +17,7 @@
     }
   ],
   "settings": {
-    "prowlarr_url": "http://your-prowlarr-host:9696",
+    "prowlarr_url": "http://your_prowlarr_host:9696",
     "rewrite_enabled": true
   }
 }

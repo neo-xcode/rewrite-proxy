@@ -92,6 +92,19 @@
             align-items: center;
             gap: 8px;
         }
+        .status-inline {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 8px;
+            flex-wrap: wrap;
+        }
+        .status-inline .status-message {
+            margin-bottom: 0;
+            padding: 8px 10px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -471,12 +484,11 @@
             </div>
         </div>
 
-        <div id="statusContainer"></div>
-        
         <div class="button-group">
             <button class="toggle-button collapsed" onclick="toggleRulesSection()" id="toggleRulesBtn">📋 Regeln</button>
             <button class="toggle-button collapsed" onclick="toggleHelpSection()" id="toggleHelpBtn">❓ Hilfe</button>
             <button class="toggle-button collapsed" id="toggleLogsBtn" onclick="toggleLogsSection()">📝 Logs</button>
+            <div id="statusContainer" class="status-inline"></div>
         </div>
         
         <div id="logsSection" class="hidden-section json-section">
@@ -1046,6 +1058,7 @@ replacement wird nur für action="replace" genutzt.</pre>
     console.log('Initializing Rewrite Proxy Admin Panel...');
     // Restore section visibility from previous session
     loadUIState();
+    loadLogs(true);
     checkHealth();
     loadRulesUI();
 

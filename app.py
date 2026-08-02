@@ -4,6 +4,7 @@ import re
 import json
 import os
 import shutil
+import fcntl
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from collections import deque
@@ -16,6 +17,7 @@ RULES_FILE = os.getenv("RULES_FILE", "/config/rules.json")
 DEFAULT_RULES_SOURCE = os.getenv("DEFAULT_RULES_SOURCE", os.path.join(BASE_DIR, "rules.json"))
 LOG_BUFFER_MAX_LINES = 500
 LOG_BUFFER = deque(maxlen=LOG_BUFFER_MAX_LINES)
+LOG_FILE = os.getenv("LOG_FILE", "/config/app.log")
 BERLIN_TZ = ZoneInfo("Europe/Berlin")
 
 
@@ -23,11 +25,40 @@ def current_time():
     return datetime.now(BERLIN_TZ)
 
 
+def ensure_log_file():
+    """Stellt sicher, dass die gemeinsame Log-Datei vorhanden ist."""
+    global LOG_FILE
+
+    parent_dir = os.path.dirname(LOG_FILE)
+    if parent_dir:
+        try:
+            os.makedirs(parent_dir, exist_ok=True)
+        except PermissionError:
+            fallback_path = os.path.join(BASE_DIR, "config", "app.log")
+            os.makedirs(os.path.dirname(fallback_path), exist_ok=True)
+            LOG_FILE = fallback_path
+
+    if not os.path.exists(LOG_FILE):
+        with open(LOG_FILE, "a", encoding="utf-8"):
+            pass
+
+
+def append_log_entry(entry):
+    """Schreibt einen Log-Eintrag atomar in die gemeinsame Datei."""
+    ensure_log_file()
+    with open(LOG_FILE, "a", encoding="utf-8") as handle:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        handle.write(entry + "\n")
+        handle.flush()
+        fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+
 def log_event(message):
-    """Speichert Log-Einträge im internen Buffer und leitet sie an stdout weiter."""
+    """Speichert Log-Einträge im internen Buffer, in der gemeinsamen Datei und leitet sie an stdout weiter."""
     timestamp = current_time().strftime("%Y-%m-%d %H:%M:%S")
     entry = f"[{timestamp}] {message}"
     LOG_BUFFER.append(entry)
+    append_log_entry(entry)
     print(entry, flush=True)
 
 
@@ -456,12 +487,27 @@ def get_rules():
     return jsonify(get_rules_state()), 200
 
 
+def read_log_lines():
+    """Liest die letzten Log-Zeilen aus der gemeinsamen Log-Datei."""
+    ensure_log_file()
+    if not os.path.exists(LOG_FILE):
+        return []
+
+    with open(LOG_FILE, "r", encoding="utf-8") as handle:
+        lines = [line.rstrip("\n") for line in handle if line.strip()]
+
+    if len(lines) > LOG_BUFFER_MAX_LINES:
+        return lines[-LOG_BUFFER_MAX_LINES:]
+    return lines
+
+
 @app.route("/api/logs")
 def get_logs():
     """Gibt die letzten Log-Zeilen zurück, die auch in docker logs erscheinen."""
+    log_lines = read_log_lines()
     response = jsonify({
-        "logs": list(LOG_BUFFER),
-        "count": len(LOG_BUFFER)
+        "logs": log_lines,
+        "count": len(log_lines)
     })
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"

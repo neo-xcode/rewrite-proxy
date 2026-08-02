@@ -459,10 +459,14 @@ def get_rules():
 @app.route("/api/logs")
 def get_logs():
     """Gibt die letzten Log-Zeilen zurück, die auch in docker logs erscheinen."""
-    return jsonify({
+    response = jsonify({
         "logs": list(LOG_BUFFER),
         "count": len(LOG_BUFFER)
-    }), 200
+    })
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response, 200
 
 
 @app.route("/api/rules", methods=["POST"])

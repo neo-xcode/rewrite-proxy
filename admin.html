@@ -620,6 +620,7 @@ replacement wird nur für action="replace" genutzt.</pre>
     let currentRules = { search_rules: [], release_rules: [], settings: {} };
     let jsonVisible = false;
     let logsVisible = false;
+    let activeLogRequest = 0;
 
     function loadRulesUI() {
         fetch('/api/rules')
@@ -845,9 +846,17 @@ replacement wird nur für action="replace" genutzt.</pre>
     function loadLogs(force = false) {
         if (!logsVisible && !force) return;
 
-        fetch('/api/logs')
+        const requestId = ++activeLogRequest;
+        const requestUrl = '/api/logs?ts=' + Date.now();
+
+        fetch(requestUrl, {
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache' }
+        })
             .then(r => r.json())
             .then(data => {
+                if (requestId !== activeLogRequest) return;
+
                 const logOutput = document.getElementById('logOutput');
                 if (!logOutput) return;
 
@@ -855,6 +864,8 @@ replacement wird nur für action="replace" genutzt.</pre>
                 logOutput.textContent = logs.length > 0 ? logs.join('\n') : 'Keine Logs verfügbar.';
             })
             .catch(() => {
+                if (requestId !== activeLogRequest) return;
+
                 const logOutput = document.getElementById('logOutput');
                 if (logOutput) {
                     logOutput.textContent = 'Log-Feed konnte nicht geladen werden.';

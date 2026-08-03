@@ -1,0 +1,73 @@
+[2026-08-03 12:22:20] WARNING: Konnte /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json nicht anlegen: [Errno 13] Permission denied: '/config'. Verwende Fallback /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json
+[2026-08-03 12:22:20] ============================================================
+[2026-08-03 12:22:20] 🚀 REWRITE PROXY STARTED
+[2026-08-03 12:22:20] ============================================================
+[2026-08-03 12:22:20] Loaded 1 search rules
+[2026-08-03 12:22:20] Rewrite enabled: True
+[2026-08-03 12:22:20] ============================================================
+[2026-08-03 12:22:20] Initialized /home/plinux/.vscode/tmp/tmp_vscode_1/tmpng2r44yc/config/rules.json from /home/plinux/.vscode/tmp/tmp_vscode_1/tmpng2r44yc/defaults/rules.json
+[2026-08-03 12:22:20] WARNING: Konnte /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json nicht anlegen: [Errno 13] Permission denied: '/config'. Verwende Fallback /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json
+[2026-08-03 12:22:20] ============================================================
+[2026-08-03 12:22:20] 🚀 REWRITE PROXY STARTED
+[2026-08-03 12:22:20] ============================================================
+[2026-08-03 12:22:20] Loaded 1 search rules
+[2026-08-03 12:22:20] Rewrite enabled: True
+[2026-08-03 12:22:20] ============================================================
+[2026-08-03 12:22:20] WARNING: Konnte /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json nicht anlegen: [Errno 13] Permission denied: '/config'. Verwende Fallback /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json
+[2026-08-03 12:22:20] ============================================================
+[2026-08-03 12:22:20] 🚀 REWRITE PROXY STARTED
+[2026-08-03 12:22:20] ============================================================
+[2026-08-03 12:22:20] Loaded 1 search rules
+[2026-08-03 12:22:20] Rewrite enabled: True
+[2026-08-03 12:22:20] ============================================================
+[2026-08-03 12:22:20] WARNING: Konnte /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json nicht anlegen: [Errno 13] Permission denied: '/config'. Verwende Fallback /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json
+[2026-08-03 12:22:20] ============================================================
+[2026-08-03 12:22:20] 🚀 REWRITE PROXY STARTED
+[2026-08-03 12:22:20] ============================================================
+[2026-08-03 12:22:20] Loaded 1 search rules
+[2026-08-03 12:22:20] Rewrite enabled: True
+[2026-08-03 12:22:20] ============================================================
+[2026-08-03 12:22:20] [rewrite_query] Input: barfoo
+[2026-08-03 12:22:20] [rewrite_query] RULES is None: False
+[2026-08-03 12:22:20] [rewrite_query] Rewrite enabled: False
+[2026-08-03 12:22:20] [rewrite_query] Early return - returning unchanged
+[2026-08-03 12:23:10] WARNING: Konnte /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json nicht anlegen: [Errno 13] Permission denied: '/config'. Verwende Fallback /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json
+[2026-08-03 12:23:10] ============================================================
+[2026-08-03 12:23:10] 🚀 REWRITE PROXY STARTED
+[2026-08-03 12:23:10] ============================================================
+[2026-08-03 12:23:10] Loaded 1 search rules
+[2026-08-03 12:23:10] Rewrite enabled: True
+[2026-08-03 12:23:10] ============================================================
+[2026-08-03 12:23:23] WARNING: Konnte /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json nicht anlegen: [Errno 13] Permission denied: '/config'. Verwende Fallback /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json
+[2026-08-03 12:23:23] ============================================================
+[2026-08-03 12:23:23] 🚀 REWRITE PROXY STARTED
+[2026-08-03 12:23:23] ============================================================
+[2026-08-03 12:23:23] Loaded 1 search rules
+[2026-08-03 12:23:23] Rewrite enabled: True
+[2026-08-03 12:23:23] ============================================================
+[2026-08-03 12:23:23] Initialized /home/plinux/.vscode/tmp/tmp_vscode_1/tmpnf7q4dvh/config/rules.json from /home/plinux/.vscode/tmp/tmp_vscode_1/tmpnf7q4dvh/defaults/rules.json
+[2026-08-03 12:23:23] WARNING: Konnte /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json nicht anlegen: [Errno 13] Permission denied: '/config'. Verwende Fallback /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json
+[2026-08-03 12:23:23] ============================================================
+[2026-08-03 12:23:23] 🚀 REWRITE PROXY STARTED
+[2026-08-03 12:23:23] ============================================================
+[2026-08-03 12:23:23] Loaded 1 search rules
+[2026-08-03 12:23:23] Rewrite enabled: True
+[2026-08-03 12:23:23] ============================================================
+[2026-08-03 12:23:23] WARNING: Konnte /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json nicht anlegen: [Errno 13] Permission denied: '/config'. Verwende Fallback /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json
+[2026-08-03 12:23:23] ============================================================
+[2026-08-03 12:23:23] 🚀 REWRITE PROXY STARTED
+[2026-08-03 12:23:23] ============================================================
+[2026-08-03 12:23:23] Loaded 1 search rules
+[2026-08-03 12:23:23] Rewrite enabled: True
+[2026-08-03 12:23:23] ============================================================
+[2026-08-03 12:23:23] WARNING: Konnte /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json nicht anlegen: [Errno 13] Permission denied: '/config'. Verwende Fallback /home/plinux/Program/Visual Studio Code/rewrite-proxy/config/rules.json
+[2026-08-03 12:23:23] ============================================================
+[2026-08-03 12:23:23] 🚀 REWRITE PROXY STARTED
+[2026-08-03 12:23:23] ============================================================
+[2026-08-03 12:23:23] Loaded 1 search rules
+[2026-08-03 12:23:23] Rewrite enabled: True
+[2026-08-03 12:23:23] ============================================================
+[2026-08-03 12:23:23] [rewrite_query] Input: barfoo
+[2026-08-03 12:23:23] [rewrite_query] RULES is None: False
+[2026-08-03 12:23:23] [rewrite_query] Rewrite enabled: False
+[2026-08-03 12:23:23] [rewrite_query] Early return - returning unchanged

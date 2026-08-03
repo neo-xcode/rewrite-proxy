@@ -25,6 +25,36 @@ def current_time():
     return datetime.now(BERLIN_TZ)
 
 
+SENSITIVE_KEY_PATTERN = re.compile(r"(api[_-]?key|token|secret|password|authorization|cookie|session|apikey)", re.IGNORECASE)
+SENSITIVE_VALUE_PATTERN = re.compile(r"(?i)(\b(?:api[_-]?key|token|secret|password|authorization|cookie|session)\b\s*[\"']?\s*[:=]\s*)([^\s,;]+)")
+
+
+def redact_sensitive_data(value):
+    """Reduziert sensible Daten in Logs, bevor sie gespeichert werden."""
+    if value is None:
+        return value
+
+    if isinstance(value, dict):
+        masked = {}
+        for key, item in value.items():
+            if isinstance(key, str) and SENSITIVE_KEY_PATTERN.search(key):
+                masked[key] = "[REDACTED]"
+            else:
+                masked[key] = redact_sensitive_data(item)
+        return masked
+
+    if isinstance(value, list):
+        return [redact_sensitive_data(item) for item in value]
+
+    text = str(value)
+    text = SENSITIVE_VALUE_PATTERN.sub(r"\1[REDACTED]", text)
+
+    if isinstance(value, str):
+        text = re.sub(r"(?i)(\b(?:api[_-]?key|token|secret|password|authorization|cookie|session)\b\s*[\"']?\s*[:=]\s*)([\"'])(.*?)\2", r"\1\2[REDACTED]\2", text)
+
+    return text
+
+
 def ensure_log_file():
     """Stellt sicher, dass die gemeinsame Log-Datei vorhanden ist."""
     global LOG_FILE
@@ -56,7 +86,8 @@ def append_log_entry(entry):
 def log_event(message):
     """Speichert Log-Einträge im internen Buffer, in der gemeinsamen Datei und leitet sie an stdout weiter."""
     timestamp = current_time().strftime("%Y-%m-%d %H:%M:%S")
-    entry = f"[{timestamp}] {message}"
+    safe_message = redact_sensitive_data(message)
+    entry = f"[{timestamp}] {safe_message}"
     LOG_BUFFER.append(entry)
     append_log_entry(entry)
     print(entry, flush=True)

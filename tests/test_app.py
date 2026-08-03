@@ -68,6 +68,23 @@ class TestAppConfig(unittest.TestCase):
 
             sys.modules.pop("app", None)
 
+    def test_log_event_redacts_sensitive_values(self):
+        sys.modules.pop("app", None)
+        module = importlib.import_module("app")
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            module.LOG_FILE = os.path.join(tmpdir, "app.log")
+            module.log_event("FORWARD params={\"api_key\": \"secret-value\", \"token\": \"abc123\"}")
+
+            with open(module.LOG_FILE, "r", encoding="utf-8") as handle:
+                content = handle.read()
+
+            self.assertIn("[REDACTED]", content)
+            self.assertNotIn("secret-value", content)
+            self.assertNotIn("abc123", content)
+
+        sys.modules.pop("app", None)
+
 
 if __name__ == "__main__":
     unittest.main()
